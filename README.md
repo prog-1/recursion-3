@@ -90,8 +90,6 @@ please provide a screenshot. I recommend using [ebiten engine] for graphics.
 
 ```go
 type (
-  // Exits represents a map of exits in a maze.
-  Exits [][]Dir
   // Coord represents an (X, Y) coordinate on the map.
   Coord struct { X, Y int }
 )
@@ -99,7 +97,7 @@ type (
 // AnyPath find the first path found between start and end coordinates. The
 // functions returns coordinates representing the path. If the path cannot be
 // found, the function returns nil.
-func AnyPath(e Exits, start, end Coord) []Coord
+func AnyPath(e [][]Dir, start, end Coord) []Coord
 ```
 
 ### Output example
