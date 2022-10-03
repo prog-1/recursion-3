@@ -78,6 +78,14 @@ exercise. The program must be implemented recursively using depth-first approach
 
 [DFS]: https://en.wikipedia.org/wiki/Depth-first_search
 
+The program must contain a tested function and must contain an example of the
+output.
+
+Note: You can use graphics to display mazes and their solutions, in which case
+please provide a screenshot. I recommend using [ebiten engine] for graphics.
+
+[ebiten engine]: https://ebitengine.org/
+
 ### Hints
 
 ```go
@@ -93,8 +101,6 @@ type (
 // found, the function returns nil.
 func AnyPath(e Exits, start, end Coord) []Coord
 ```
-
-The function must solve the maze generated in (1).
 
 ### Output example
 
