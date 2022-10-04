@@ -39,7 +39,7 @@ The program must output the generated maze using pseudo graphics (or graphics).
 or you could use this [pseudo-graphics maze printer] (absolutelly untested, but
 seems to show something useful):
 
-[pseudo-graphics maze printer]: https://go.dev/play/p/1scrAjaObwC
+[pseudo-graphics maze printer]: https://go.dev/play/p/voz2dTPjO7h
 
 ```txt
 ┌───────────────┬───┬───────────────────────────┐
