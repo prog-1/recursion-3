@@ -36,6 +36,39 @@ The program must output the generated maze using pseudo graphics (or graphics).
   |___________________|
 ```
 
+or you could use this [pseudo-graphics maze printer] (absolutelly untested, but
+seems to show something useful):
+
+[pseudo-graphics maze printer]: https://go.dev/play/p/1scrAjaObwC
+
+```txt
+┌───────────────┬───┬───────────────────────────┐
+│               │   │                           │
+├───────┬───┐   │   │   ┌───────┐   ────┬────   │
+│       │   │   │   │   │       │       │       │
+│       │   │   │   │   │       └───┐   ├───────┤
+│   │       │   │   │   │   │       │   │       │
+│   └───┐   │   │   │   └───┤       │   │       │
+│       │   │   │   │       │   │   │       │   │
+│       └───┘   │   └───┐   │   └───┴───┬───┘   │
+│   │           │       │   │           │       │
+│   ├───┬───────┘       │   │   ────┐   │   ────┤
+│   │   │           │   │   │       │   │       │
+│   │   │   ┌───┐   │   │   └───────┘   ├────   │
+│   │       │   │   │   │               │       │
+│   └───┐   │   │   └───┼───────┐   ┌───┘       │
+│       │   │   │       │       │   │       │   │
+├───┐   │   │   └───┐   │       │   │   ────┴───┤
+│   │   │           │       │       │           │
+│   │   │   ┌───────┴───────┤   ────┴───┬────   │
+│       │   │               │           │       │
+│   ────┴───┘   ┌───────┐   ├───────────┤       │
+│               │       │   │           │   │   │
+├───────────────┘   ────┘   │   ┌────   │   │   │
+│                               │           │   │
+└───────────────────────────────┴───────────┴───┘
+```
+
 ### Hints
 
 Each cell should contain information about available exits. You could use a
@@ -121,3 +154,4 @@ X - exit
   |SSS****            |
   |___________________|
 ```
+
