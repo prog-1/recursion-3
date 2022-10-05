@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"math/rand"
+	"time"
 )
 
 var a = [][]byte{
@@ -139,7 +140,8 @@ func main() {
 	// 	}
 	// 	fmt.Println()
 	// }
-	maze := generateMaze(5, 5)
+	rand.Seed(time.Now().Unix())
+	maze := generateMaze(10, 10)
 	fmt.Println(maze)
 	for line := range maze {
 		fmt.Print("|")
