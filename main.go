@@ -86,7 +86,11 @@ func generateMaze(x, y int) [][]Sector {
 	for line := range maze {
 		for cell := range maze[line] {
 			if cell != len(maze[line])-1 {
-				maze[line][cell].canWalkRight = rand.Intn(2) == 0
+				if line == len(maze)-1 {
+					maze[line][cell].canWalkRight = true
+				} else {
+					maze[line][cell].canWalkRight = rand.Intn(2) == 0
+				}
 				if maze[line][cell].canWalkRight {
 					maze[line][cell+1].id = maze[line][cell].id
 				}
@@ -140,7 +144,7 @@ func main() {
 	// 	}
 	// 	fmt.Println()
 	// }
-	rand.Seed(time.Now().Unix())
+	rand.Seed(time.Now().UnixNano())
 	maze := generateMaze(10, 10)
 	fmt.Println(maze)
 	for line := range maze {
