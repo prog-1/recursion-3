@@ -73,6 +73,25 @@ func FindPath(m [][]byte, current coord) (successful bool, path []coord) {
 	return false, path
 }
 
+func contains(s []int, a int) bool {
+	for _, v := range s {
+		if a == v {
+			return true
+		}
+	}
+	return false
+}
+
+func randomChoice(length int) (res []int) {
+	for i := random(1, length+1); i >= 0; i-- {
+		tmp := random(1, length+1)
+		if !contains(res, tmp) {
+			res = append(res, tmp)
+		}
+	}
+	return
+}
+
 func generateMaze(x, y int) [][]Sector {
 	maze := make([][]Sector, y)
 	var id int
@@ -96,23 +115,44 @@ func generateMaze(x, y int) [][]Sector {
 				}
 			}
 		}
+
 		if line != len(maze)-1 {
-			var changed bool
-			for cell, watchID, start := 0, maze[line][0].id, 0; cell <= len(maze[line]); cell++ {
-				if cell == len(maze[line]) || watchID != maze[line][cell].id {
-					if !changed {
-						//mt.Println(start, cell, random(start, cell))
-						tmp := random(start, cell)
-						maze[line+1][tmp].canWalkUp = true
-						maze[line+1][tmp].id = maze[line][tmp].id
-					}
-					if cell != len(maze[line]) {
-						changed = false
-						watchID = maze[line][cell].id
-						start = cell
+			for i := 0; i < id; i++ {
+				var cont []int
+				for cell := range maze[line] {
+					if maze[line][cell].id == i {
+						cont = append(cont, cell)
 					}
 				}
+				if len(cont) > 1 {
+					tmp := randomChoice(len(cont) - 1)
+					for _, v := range tmp {
+						maze[line+1][cont[v]].canWalkUp = true
+						maze[line+1][cont[v]].id = maze[line][cont[v]].id
+					}
+				} else if len(cont) == 1 {
+					maze[line+1][cont[0]].canWalkUp = true
+					maze[line+1][cont[0]].id = maze[line][cont[0]].id
+				}
 			}
+			// var changed bool
+			/*			for cell, watchID, start := 0, maze[line][0].id, 0; cell <= len(maze[line]); cell++ {
+								if cell == len(maze[line]) || watchID != maze[line][cell].id {
+									if !changed {
+										//mt.Println(start, cell, random(start, cell))
+										tmp := random(start, cell)
+										maze[line+1][tmp].canWalkUp = true
+										maze[line+1][tmp].id = maze[line][tmp].id
+									}
+									if cell != len(maze[line]) {
+										changed = false
+										watchID = maze[line][cell].id
+										start = cell
+									}
+								}
+							}
+						}
+					}*/
 		}
 	}
 	return maze
@@ -122,7 +162,6 @@ func random(min, max int) int {
 	return rand.Intn(max-min) + min
 }
 
-type mazee [][]Sector
 type Sector struct {
 	id           int
 	canWalkRight bool
