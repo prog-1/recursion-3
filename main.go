@@ -142,15 +142,20 @@ func main() {
 	maze := generateMaze(5, 5)
 	fmt.Println(maze)
 	for line := range maze {
+		fmt.Print("|")
 		for _, cell := range maze[line] {
 			if cell.canWalkUp {
 				if cell.canWalkRight {
-					fmt.Print("..")
+					fmt.Print("  ")
 				} else {
-					fmt.Print(".X")
+					fmt.Print(" |")
 				}
 			} else {
-				fmt.Print("XX")
+				if cell.canWalkRight {
+					fmt.Print("‾ ")
+				} else {
+					fmt.Print("‾|")
+				}
 			}
 		}
 		fmt.Println()
