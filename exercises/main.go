@@ -9,7 +9,7 @@ const (
 	W
 )
 
-func fill(dirs [][]byte) [][]byte {
+func print(dirs [][]byte) {
 	n, m := len(dirs), len(dirs[0])
 
 	// Creating a map, which will be displayed on terminal
@@ -50,10 +50,9 @@ func fill(dirs [][]byte) [][]byte {
 		}
 	}
 
-	return maze
+	printMaze(maze)
 }
-
-func print(maze [][]byte) {
+func printMaze(maze [][]byte) {
 	for i := range maze {
 		for j := range maze[i] {
 			fmt.Print(string(maze[i][j]))
@@ -63,17 +62,10 @@ func print(maze [][]byte) {
 }
 
 func main() {
-	// var n, m uint64 = 2, 3
-	// dirs := make([][]byte, n)
-	// for i := range dirs {
-	// 	dirs[i] = make([]byte, m)
-	// }
-
-	var dirs [][]byte = [][]byte{
-		{0b0010, 0b1100, 0b0000},
-		{0b0010, 0b1011, 0b1000},
+	var n, m uint64 = 2, 3
+	dirs := make([][]byte, n)
+	for i := range dirs {
+		dirs[i] = make([]byte, m)
 	}
-
-	maze := fill(dirs)
-	print(maze)
+	print(dirs)
 }
