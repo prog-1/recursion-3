@@ -36,10 +36,6 @@ func generateMaze(n, m uint) [][]byte {
 
 // Auxiliary function for generateMaze()
 func gen(maze [][]byte, visited [][]bool, i, j int, entry byte) {
-	// Checking if we haven't went out of maze's bounds or if we've visited it already:
-	if i < 0 || i >= len(maze) || j < 0 || j >= len(maze[0]) || visited[i][j] {
-		return
-	}
 
 	visited[i][j] = true // Marking current cell as visited
 
@@ -56,13 +52,15 @@ func gen(maze [][]byte, visited [][]bool, i, j int, entry byte) {
 		// Getting random available direction:
 		r := rand.Intn(len(ways)) // Getting index of random available direction
 		way := ways[r]
-		maze[i][j] |= way // Marking way as visited
 		ways = removeWay(ways, r)
 
-		// Proceed with next cell at direction:
+		// Try to proceed with next cell at direction:
 		in, jn := getIndexByWay(way, i, j)
-
-		gen(maze, visited, in, jn, getEntry(way))
+		// Checking if we haven't went out of maze's bounds or if we've visited it already:
+		if in >= 0 && in < len(maze) && jn >= 0 && jn < len(maze[0]) && !visited[in][jn] {
+			maze[i][j] |= way // Marking way as visited
+			gen(maze, visited, in, jn, getEntry(way))
+		}
 
 	}
 }
@@ -95,6 +93,38 @@ func removeWay(ways []byte, i int) []byte {
 		return ways[i+1:]
 	} else { // Not last, not first
 		return append(ways[:i], ways[i+1])
+	}
+}
+
+// Returns index of the next neighbor at the specified way(direction)
+func getIndexByWay(way byte, i, j int) (int, int) {
+	switch way {
+	case N:
+		return i - 1, j
+	case E:
+		return i, j + 1
+	case S:
+		return i + 1, j
+	case W:
+		return i, j - 1
+	default: // Should never happen
+		return 0, 0
+	}
+}
+
+// Returns entry way for the next cell according to the exit way of the current cell
+func getEntry(exit byte) byte {
+	switch exit {
+	case N:
+		return S
+	case E:
+		return W
+	case S:
+		return N
+	case W:
+		return E
+	default: // Should never happen
+		return 0
 	}
 }
 
@@ -146,38 +176,6 @@ func printMaze(maze [][]byte) {
 			fmt.Print(string(output[i][j]))
 		}
 		fmt.Println()
-	}
-}
-
-// Returns index of the next neighbor at the specified way(direction)
-func getIndexByWay(way byte, i, j int) (int, int) {
-	switch way {
-	case N:
-		return i - 1, j
-	case E:
-		return i, j + 1
-	case S:
-		return i + 1, j
-	case W:
-		return i, j - 1
-	default: // Should never happen
-		return 0, 0
-	}
-}
-
-// Returns entry way for the next cell according to the exit way of the current cell
-func getEntry(exit byte) byte {
-	switch exit {
-	case N:
-		return S
-	case E:
-		return W
-	case S:
-		return N
-	case W:
-		return E
-	default: // Should never happen
-		return 0
 	}
 }
 
