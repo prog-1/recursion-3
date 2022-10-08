@@ -208,29 +208,31 @@ func solveMaze(maze [][]byte, exit Index) {
 func solve(i Index, maze [][]byte, visited [][]bool, solved *bool) {
 	// Processing current char:
 	char := &maze[i.i][i.j]
-	if (*char != ' ') && (*char != 'E') { // If we're in the wall
-		return
-	}
-	if *char == 'E' { // If we're at the exit
+	if *char == 'E' { // Exit
 		*solved = true
 		return
 	}
-	visited[i.i][i.j] = true
-	*char = '*' // Marking as way
+	if (*char != ' ') { // Wall
+		return
+	} else { // Empty
+		visited[i.i][i.j] = true
+		*char = '*' // Marking as way
+	}
 
 	// Proceeding with the neighbors:
 	ways := []byte{N, E, S, W}
-	for len(ways) != 0 && !*solved {
+	for len(ways) != 0 && !*solved {// NOTE: If maze is solved, then we have no need to go anywhere anymore
 		way := ways[0]
 		ways = removeWay(ways, 0)
 		n := getIndexByWay(way, i)
-		if n.i > 0 && n.i < len(maze)-1 && n.j > 0 && n.j < len(maze[0])-1 && !visited[n.i][n.j] { // If next char is within bounds & is not visited
+		if n.i > 0 && n.i < len(maze)-1 && n.j > 0 && n.j < len(maze[0])-1 && !visited[n.i][n.j] {
 			solve(n, maze, visited, solved)
-		}
+		} // NOTE: We can skip border character processing cause we have nothing to do there
 	}
 
+	// On backtracking:
 	if !*solved {
-		*char = '@' // Marking unsuccessfull way
+		*char = '@' // Marking unsuccessful way
 	}
 }
 
