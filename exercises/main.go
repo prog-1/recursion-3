@@ -14,9 +14,13 @@ const (
 	W
 )
 
+type Index struct {
+	i, j int
+}
+
 // Returns randomly generated maze of given size(n - height, m - width)
 // Note that maze is represented as 2D array of bytes
-func generateMaze(n, m uint) [][]byte {
+func generateWays(n, m uint) [][]byte {
 	// Creating 2D byte array, which represents a maze:
 	maze := make([][]byte, n)
 	for i := range maze {
@@ -29,24 +33,25 @@ func generateMaze(n, m uint) [][]byte {
 		visited[i] = make([]bool, m)
 	}
 
-	gen(maze, visited, 0, 0, N)
+	gen(maze, visited, Index{0, 0}, N)
 
 	return maze
 }
 
 // Auxiliary function for generateMaze()
-func gen(maze [][]byte, visited [][]bool, i, j int, entry byte) {
+func gen(maze [][]byte, visited [][]bool, cur Index, entry byte) {
+	cell := &maze[cur.i][cur.j]
 
-	visited[i][j] = true // Marking current cell as visited
+	visited[cur.i][cur.j] = true // Marking current cell as visited
 
-	ways := getAvailableWays(maze[i][j])
+	ways := getAvailableWays(*cell)
 
 	// Removing entry way:
 	var k int
 	for k = 0; ways[k] != entry; k++ { // Getting index of entry way in slice of available ways
 	}
-	maze[i][j] |= ways[k]     // Marking way as visited
-	ways = removeWay(ways, k) // Removing entry way out of slice of available ways
+	*cell |= ways[k] // Marking way as visited
+	ways = removeWay(ways, k)     // Removing entry way out of slice of available ways
 
 	for len(ways) != 0 {
 		// Getting random available direction:
@@ -55,11 +60,11 @@ func gen(maze [][]byte, visited [][]bool, i, j int, entry byte) {
 		ways = removeWay(ways, r)
 
 		// Try to proceed with next cell at direction:
-		in, jn := getIndexByWay(way, i, j)
+		n := getIndexByWay(way, cur)
 		// Checking if we haven't went out of maze's bounds or if we've visited it already:
-		if in >= 0 && in < len(maze) && jn >= 0 && jn < len(maze[0]) && !visited[in][jn] {
-			maze[i][j] |= way // Marking way as visited
-			gen(maze, visited, in, jn, getEntry(way))
+		if n.i >= 0 && n.i < len(maze) && n.j >= 0 && n.j < len(maze[0]) && !visited[n.i][n.j] {
+			*cell |= way // Marking way as visited
+			gen(maze, visited, n, getEntry(way))
 		}
 
 	}
@@ -97,18 +102,18 @@ func removeWay(ways []byte, i int) []byte {
 }
 
 // Returns index of the next neighbor at the specified way(direction)
-func getIndexByWay(way byte, i, j int) (int, int) {
+func getIndexByWay(way byte, i Index) Index {
 	switch way {
 	case N:
-		return i - 1, j
+		return Index{i.i - 1, i.j}
 	case E:
-		return i, j + 1
+		return Index{i.i, i.j + 1}
 	case S:
-		return i + 1, j
+		return Index{i.i + 1, i.j}
 	case W:
-		return i, j - 1
+		return Index{i.i, i.j - 1}
 	default: // Should never happen
-		return 0, 0
+		return Index{0, 0}
 	}
 }
 
@@ -130,22 +135,33 @@ func getEntry(exit byte) byte {
 
 // Prints maze in terminal window
 func printMaze(maze [][]byte) {
+	// Printing output array:
+	for i := range maze {
+		for j := range maze[i] {
+			fmt.Print(string(maze[i][j]))
+		}
+		fmt.Println()
+	}
+}
+
+// Returns 2D slice of bytes(chars) which is graphical represenation of maze
+func getMaze(ways [][]byte) [][]byte {
 	// Creating char array, which will be displayed on screen:
-	output := make([][]byte, len(maze)*3)
+	output := make([][]byte, len(ways)*3)
 	for i := range output {
-		output[i] = make([]byte, len(maze[0])*3)
+		output[i] = make([]byte, len(ways[0])*3)
 	}
 
 	// Filling output array:
-	for i, k := 0, 1; i < len(maze); i, k = i+1, k+3 {
-		for j, w := 0, 1; j < len(maze[i]); j, w = j+1, w+3 {
+	for i, k := 0, 1; i < len(ways); i, k = i+1, k+3 {
+		for j, w := 0, 1; j < len(ways[i]); j, w = j+1, w+3 {
 			output[k][w] = ' '     // Middle
 			output[k-1][w-1] = '+' // NorthWest
 			output[k-1][w+1] = '+' // NorthEast
 			output[k+1][w+1] = '+' // SouthEash
 			output[k+1][w-1] = '+' // SouthWest
 
-			cell := maze[i][j]
+			cell := ways[i][j]
 			if cell&N == N {
 				output[k-1][w] = ' '
 			} else {
@@ -170,18 +186,15 @@ func printMaze(maze [][]byte) {
 		}
 	}
 
-	// Printing output array:
-	for i := range output {
-		for j := range output[i] {
-			fmt.Print(string(output[i][j]))
-		}
-		fmt.Println()
-	}
+	return output
 }
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
-	var n, m uint = 5, 10
-	maze := generateMaze(n, m)
+	var n, m uint
+	fmt.Scanln(&n, &m)
+	ways := generateWays(n, m)
+	maze := getMaze(ways)
+
 	printMaze(maze)
 }
