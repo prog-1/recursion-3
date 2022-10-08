@@ -27,7 +27,7 @@ func generateWays(n, m uint) [][]byte {
 		maze[i] = make([]byte, m)
 	}
 
-	// Create array to store whether some cell was visited or not:
+	// Creating array to store whether some cell was visited or not:
 	visited := make([][]bool, n)
 	for i := range visited {
 		visited[i] = make([]bool, m)
@@ -50,8 +50,8 @@ func gen(maze [][]byte, visited [][]bool, cur Index, entry byte) {
 	var k int
 	for k = 0; ways[k] != entry; k++ { // Getting index of entry way in slice of available ways
 	}
-	*cell |= ways[k] // Marking way as visited
-	ways = removeWay(ways, k)     // Removing entry way out of slice of available ways
+	*cell |= ways[k]          // Marking way as visited
+	ways = removeWay(ways, k) // Removing entry way out of slice of available ways
 
 	for len(ways) != 0 {
 		// Getting random available direction:
@@ -144,7 +144,7 @@ func printMaze(maze [][]byte) {
 	}
 }
 
-// Returns 2D slice of bytes(chars) which is graphical represenation of maze
+// Returns 2D slice of bytes(chars) as graphical represenation of maze
 func getMaze(ways [][]byte) [][]byte {
 	// Creating char array, which will be displayed on screen:
 	output := make([][]byte, len(ways)*3)
@@ -189,12 +189,58 @@ func getMaze(ways [][]byte) [][]byte {
 	return output
 }
 
+// Writes solution path into given graphical represenation of maze
+func solveMaze(maze [][]byte, exit Index) {
+	// Creating array to store whether some char was visited or not:
+	visited := make([][]bool, len(maze))
+	for i := range visited {
+		visited[i] = make([]bool, len(maze[i]))
+	}
+
+	maze[exit.i][exit.j] = 'E' // Marking exit
+
+	start := Index{1, 1}
+	var solved bool
+	solve(start, maze, visited, &solved)
+}
+
+// Auxiliary function for solveMaze()
+func solve(i Index, maze [][]byte, visited [][]bool, solved *bool) {
+	// Processing current char:
+	char := &maze[i.i][i.j]
+	if (*char != ' ') && (*char != 'E') { // If we're in the wall
+		return
+	}
+	if *char == 'E' { // If we're at the exit
+		*solved = true
+		return
+	}
+	visited[i.i][i.j] = true
+	*char = '*' // Marking as way
+
+	// Proceeding with the neighbors:
+	ways := []byte{N, E, S, W}
+	for len(ways) != 0 && !*solved {
+		way := ways[0]
+		ways = removeWay(ways, 0)
+		n := getIndexByWay(way, i)
+		if n.i > 0 && n.i < len(maze)-1 && n.j > 0 && n.j < len(maze[0])-1 && !visited[n.i][n.j] { // If next char is within bounds & is not visited
+			solve(n, maze, visited, solved)
+		}
+	}
+
+	if !*solved {
+		*char = '@' // Marking unsuccessfull way
+	}
+}
+
 func main() {
 	rand.Seed(time.Now().UnixNano())
 	var n, m uint
 	fmt.Scanln(&n, &m)
 	ways := generateWays(n, m)
 	maze := getMaze(ways)
-
+	exit := Index{len(maze) - 2, len(maze[0]) - 2}
+	solveMaze(maze, exit)
 	printMaze(maze)
 }
