@@ -29,12 +29,11 @@ func printExits(e [][]Dir, x, y int) {
 				fmt.Print("_")
 			}
 			if e[rows][cols]&E != 0 {
-				if (e[rows][cols+1])|(e[rows][cols])&S != 0 {
+				if (e[rows][cols+1])&S != 0 || (e[rows][cols])&S != 0 {
 					fmt.Print(" ")
 				} else {
 					fmt.Print("_")
 				}
-
 			} else {
 				fmt.Print("|")
 			}
