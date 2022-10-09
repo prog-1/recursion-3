@@ -8,7 +8,7 @@ import (
 
 /*
 PLAN: ⬇⬆
-Baby steps:
+Generation:
 
 #1 Initialize cell struct ✔
 	Cell struct contains 5 booleans. First 4 bool represend directions (N,E,S,W). True - emptyness, False - wall.
@@ -80,18 +80,18 @@ func main() {
 	// ## INITIALIZING 2D CELL SLICE ##
 	var cols, rows int
 	fmt.Scanln(&cols, &rows) // reading maze length
-	//cols, rows := 4, 10                 //for debug
+	//cols, rows := 10, 50                //for debug
 	cells := make([][]cellStruct, cols) // creating cell slice with given columns
 	for i := range cells {
 		cells[i] = make([]cellStruct, rows) // editing cell slice to have given rows
 	}
 
-	// ## GENERATING MAZE ##
+	//## MAZE ##
 	generateMaze(cells)
 	maze := createMaze(cells)
-	printMaze(maze)
 	//fmt.Print(cells)//for degub
-
+	solveMaze(maze, cellCoord{1, 1}, cellCoord{len(maze) - 2, len(maze[0]) - 2})
+	printMaze(maze)
 }
 
 // ## GENERATE MAZE ##
@@ -131,13 +131,10 @@ func walk(cells [][]cellStruct, curCoord cellCoord) {
 		nextCell := &cells[nextCoord.y][nextCoord.x] // taking next cell from coordinates
 		//(I know that it is extra variable declaration, but it's more readable for me this way)
 		if nextCell.visited { // if the next cell is visited
-			//stack = stack[:len(stack)-1] // deleting last cell from stack slice
 			continue
 		}
 
 		//if we are here it means the next cell is the available empty cell and we are going there
-
-		//stack = append(stack, nextCell)// adding next cell to stack slice
 
 		destroyWallz(cell, nextCell, dir) //break walls. Set selected direction to true (path)
 		walk(cells, nextCoord)            // calling recursion, switching to next cell
@@ -188,6 +185,7 @@ func getDirs(cell *cellStruct) (dirs []byte) {
 	return dirs
 }
 
+// ## DESTROY WALLS ON GIVEN DIRECTION ##
 func destroyWallz(cell *cellStruct, nextCell *cellStruct, dir byte) {
 	switch dir {
 	case 'n': //north
@@ -205,6 +203,7 @@ func destroyWallz(cell *cellStruct, nextCell *cellStruct, dir byte) {
 	}
 }
 
+// ## PRINTING MAZE IN CONSOLE ##
 func printMaze(maze [][]rune) {
 	for i := range maze {
 		for j := range maze[i] {
@@ -215,9 +214,12 @@ func printMaze(maze [][]rune) {
 	}
 }
 
+// ## CREATING MAZE FROM CELL STRUCT SLICE ##
 func createMaze(cells [][]cellStruct) [][]rune {
 	// Creating maze 2d byte slice
 	maze := make([][]rune, len(cells)*3)
+	//maze slice is 3x bigger then cell slice, because
+	//one cell is 3x3 element in maze
 	for i := range maze {
 		maze[i] = make([]rune, len(cells[0])*3)
 	}
@@ -225,11 +227,11 @@ func createMaze(cells [][]cellStruct) [][]rune {
 	// Filling output array:
 	for i, y := 0, 1; i < len(cells); i, y = i+1, y+3 {
 		for j, x := 0, 1; j < len(cells[i]); j, x = j+1, x+3 {
-			maze[y][x] = ' '     // Middle
-			maze[y-1][x-1] = '┘' // NorthWest
-			maze[y-1][x+1] = '└' // NorthEast
-			maze[y+1][x+1] = '┌' // SouthEash
-			maze[y+1][x-1] = '┐' // SouthWest
+			maze[y][x] = ' '     // Center
+			maze[y+1][x+1] = '┌' // South-Eash
+			maze[y-1][x+1] = '└' // North-East
+			maze[y+1][x-1] = '┐' // South-West
+			maze[y-1][x-1] = '┘' // North-West
 
 			cell := cells[i][j]
 			if cell.n { //North
@@ -257,4 +259,64 @@ func createMaze(cells [][]cellStruct) [][]rune {
 	}
 
 	return maze
+}
+
+func solveMaze(maze [][]rune, startCoord, endCoord cellCoord) {
+
+	//Initializing visited 2d slice
+	visited := make([][]bool, len(maze)) // creating cell slice with given columns
+	for i := range maze {
+		visited[i] = make([]bool, len(maze[i])) // editing cell slice to have given rows
+	}
+
+	var solved bool
+	passMaze(maze, startCoord, endCoord, visited, &solved)
+
+}
+
+// function to reccursively walk in the maze
+func passMaze(maze [][]rune, curCoord, endCoord cellCoord, visited [][]bool, solved *bool) {
+
+	//check if it is exit ✔
+	//mark cur cell as visited, set cell symbol to '•' ✔
+	//check available directions (for loop) ✔
+	//move along all available directions clockwise from n ✔
+	//delete checked direction ✔
+	//check maze borders and visited ✔
+	//check if it is wall or emptyness ✔
+	//if all checks passed and it's emptyness, we are going that way (calling recursion) ✔
+	//after loop, if we are backtracking when maze is not solved yet, set cell symbol to 'o' ✔
+
+	if curCoord == endCoord {
+		maze[curCoord.y][curCoord.x] = '✔'
+		*solved = true
+		return
+	}
+
+	cell := &maze[curCoord.y][curCoord.x]
+	*cell = '•'
+	visited[curCoord.y][curCoord.x] = true
+
+	dirs := []byte{'n', 'e', 's', 'w'} //initializing all 4 directions for each cell (checks later)
+	for len(dirs) != 0 && !*solved {
+		nextCoord := getNextCell(dirs[0], curCoord)                                                        //getting next cell from direction
+		dirs = dirs[1:]                                                                                    //deleting first direction from dirs slice
+		if 0 > nextCoord.y || nextCoord.y >= len(maze) || 0 > nextCoord.x || nextCoord.x >= len(maze[0]) { // if we went outside of maze borders
+			continue //starting new iteration of the loop
+		}
+		if visited[nextCoord.y][nextCoord.x] { // if the next cell is visited
+			continue
+		}
+		if maze[nextCoord.y][nextCoord.x] != ' ' { // if next cell is no matter which type of wall
+			continue
+		}
+		passMaze(maze, nextCoord, endCoord, visited, solved)
+	}
+	//Backtracking
+	if !*solved {
+		//if we are backtracking when maze is not solved, we appeared in dead end.
+		//If we are backtracking when maze is solved, we are not in dead end.
+		*cell = 'o'
+	}
+
 }
