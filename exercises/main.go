@@ -134,7 +134,7 @@ func getEntry(exit byte) byte {
 }
 
 // Prints maze in terminal window
-func printMaze(maze [][]byte) {
+func printMaze(maze [][]rune) {
 	// Printing output array:
 	for i := range maze {
 		for j := range maze[i] {
@@ -144,22 +144,22 @@ func printMaze(maze [][]byte) {
 	}
 }
 
-// Returns 2D slice of bytes(chars) as graphical represenation of maze
-func getMaze(ways [][]byte) [][]byte {
+// Returns 2D slice of runes(chars) as graphical represenation of maze
+func getMaze(ways [][]byte) [][]rune {
 	// Creating char array, which will be displayed on screen:
-	output := make([][]byte, len(ways)*3)
+	output := make([][]rune, len(ways)*3)
 	for i := range output {
-		output[i] = make([]byte, len(ways[0])*3)
+		output[i] = make([]rune, len(ways[0])*3)
 	}
 
 	// Filling output array:
 	for i, k := 0, 1; i < len(ways); i, k = i+1, k+3 {
 		for j, w := 0, 1; j < len(ways[i]); j, w = j+1, w+3 {
 			output[k][w] = ' '     // Middle
-			output[k-1][w-1] = '+' // NorthWest
-			output[k-1][w+1] = '+' // NorthEast
-			output[k+1][w+1] = '+' // SouthEash
-			output[k+1][w-1] = '+' // SouthWest
+			output[k-1][w-1] = '┌' // NorthWest
+			output[k-1][w+1] = '┐' // NorthEast
+			output[k+1][w+1] = '┘' // SouthEash
+			output[k+1][w-1] = '└' // SouthWest
 
 			cell := ways[i][j]
 			if cell&N == N {
@@ -190,7 +190,7 @@ func getMaze(ways [][]byte) [][]byte {
 }
 
 // Writes solution path into given graphical represenation of maze
-func solveMaze(maze [][]byte, exit Index) {
+func solveMaze(maze [][]rune, exit Index) {
 	// Creating array to store whether some char was visited or not:
 	visited := make([][]bool, len(maze))
 	for i := range visited {
@@ -205,23 +205,23 @@ func solveMaze(maze [][]byte, exit Index) {
 }
 
 // Auxiliary function for solveMaze()
-func solve(i Index, maze [][]byte, visited [][]bool, solved *bool) {
+func solve(i Index, maze [][]rune, visited [][]bool, solved *bool) {
 	// Processing current char:
 	char := &maze[i.i][i.j]
 	if *char == 'E' { // Exit
 		*solved = true
 		return
 	}
-	if (*char != ' ') { // Wall
+	if *char != ' ' { // Wall
 		return
 	} else { // Empty
 		visited[i.i][i.j] = true
-		*char = '*' // Marking as way
+		*char = '.' // Marking as way
 	}
 
 	// Proceeding with the neighbors:
 	ways := []byte{N, E, S, W}
-	for len(ways) != 0 && !*solved {// NOTE: If maze is solved, then we have no need to go anywhere anymore
+	for len(ways) != 0 && !*solved { // NOTE: If maze is solved, then we have no need to go anywhere anymore
 		way := ways[0]
 		ways = removeWay(ways, 0)
 		n := getIndexByWay(way, i)
@@ -232,7 +232,7 @@ func solve(i Index, maze [][]byte, visited [][]bool, solved *bool) {
 
 	// On backtracking:
 	if !*solved {
-		*char = '@' // Marking unsuccessful way
+		*char = '`' // Marking unsuccessful way
 	}
 }
 
