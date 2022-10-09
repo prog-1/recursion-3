@@ -57,7 +57,7 @@ func dir2(d Dir, nrow, ncol int) (int, int) {
 	case S:
 		return nrow + 1, ncol
 	}
-	return nrow, ncol
+	panic(fmt.Sprintf("dir2: unknown direction %v", d))
 }
 
 func diropos(d Dir) Dir {
@@ -71,16 +71,12 @@ func diropos(d Dir) Dir {
 	case S:
 		return N
 	}
-	return 0
+	panic(fmt.Sprintf("diropos: unknown direction %v", d))
 }
 
 func genExits(e [][]Dir, row, col int) {
-	dirs := allDirs
-	for i := range dirs {
-		n := rand.Intn(len(dirs) - i)
-		dirs[i], dirs[i+n] = dirs[i+n], dirs[i]
-	}
-	for _, d := range dirs {
+	for _, dirs := range rand.Perm(len(allDirs)) {
+		d := allDirs[dirs]
 		nrow, ncol := dir2(d, row, col)
 		if ncol < 0 || ncol >= len(e[0]) || nrow < 0 || nrow >= len(e) {
 			continue
