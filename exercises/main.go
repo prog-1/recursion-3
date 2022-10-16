@@ -238,11 +238,12 @@ func solve(i Index, maze [][]rune, visited [][]bool, solved *bool) {
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
-	var n, m uint
-	fmt.Scanln(&n, &m)
-	ways := generateWays(n, m)
+	// var n, m uint
+	// fmt.Scanln(&n, &m)
+	ways := generateWays(2, 4)
 	maze := getMaze(ways)
 	exit := Index{len(maze) - 2, len(maze[0]) - 2}
+	printMaze(maze)
 	solveMaze(maze, exit)
 	printMaze(maze)
 }
